@@ -26,7 +26,8 @@
   --mono: 'Space Mono', monospace;
   --sans: 'DM Sans', sans-serif;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
+*{margin:0;padding:0;box-sizing:border-box;cursor:auto;}
+a,button,.buy-btn,.btn-primary,.btn-ghost,.nav-cta,.tier{cursor:pointer;}
 html{scroll-behavior:smooth;}
 body {
   background: var(--bg);
@@ -560,49 +561,43 @@ function resize() { W = canvas.width = window.innerWidth; H = canvas.height = wi
 resize();
 window.addEventListener('resize', resize);
 
-const particles = [];
 let mx = -999, my = -999;
+// outer slow orb
+let ox = -999, oy = -999;
+// inner faster bloom
+let ix = -999, iy = -999;
 
 document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
 
-function spawn() {
-  if (mx < 0) return;
-  const angle = Math.random() * Math.PI * 2;
-  const speed = Math.random() * 0.6 + 0.1;
-  particles.push({
-    x: mx, y: my,
-    vx: Math.cos(angle) * speed,
-    vy: Math.sin(angle) * speed - 0.3,
-    life: 1,
-    size: Math.random() * 3 + 1,
-  });
+function drawOrb(x, y, radius, alpha) {
+  if (x < -900) return;
+  const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
+  g.addColorStop(0,   `rgba(61,255,160,${alpha})`);
+  g.addColorStop(0.4, `rgba(61,255,160,${alpha * 0.3})`);
+  g.addColorStop(1,   `rgba(61,255,160,0)`);
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = g;
+  ctx.fill();
 }
 
-function draw() {
+function tick() {
   ctx.clearRect(0, 0, W, H);
-  for (let i = 0; i < 3; i++) spawn();
 
-  for (let i = particles.length - 1; i >= 0; i--) {
-    const p = particles[i];
-    p.x += p.vx;
-    p.y += p.vy;
-    p.life -= 0.025;
-    if (p.life <= 0) { particles.splice(i, 1); continue; }
+  // lerp both orbs toward cursor at different speeds
+  ox += (mx - ox) * 0.06;
+  oy += (my - oy) * 0.06;
+  ix += (mx - ix) * 0.18;
+  iy += (my - iy) * 0.18;
 
-    const alpha = p.life * 0.35;
-    const radius = p.size * p.life;
-    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius * 6);
-    grad.addColorStop(0, `rgba(61,255,160,${alpha})`);
-    grad.addColorStop(1, `rgba(61,255,160,0)`);
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, radius * 6, 0, Math.PI * 2);
-    ctx.fillStyle = grad;
-    ctx.fill();
-  }
+  // large soft ambient glow
+  drawOrb(ox, oy, 180, 0.06);
+  // tighter inner bloom
+  drawOrb(ix, iy, 60, 0.10);
 
-  requestAnimationFrame(draw);
+  requestAnimationFrame(tick);
 }
-draw();
+tick();
 </script>
 </body>
 </html>

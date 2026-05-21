@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Stat Tracker Pro — Vector Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #050507;
+  --bg2: #0b0c10;
+  --bg3: #111318;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.08);
+  --border-bright: rgba(99,255,180,0.3);
+  --accent: #3dffa0;
+  --accent2: #00e5ff;
+  --accent-dim: rgba(61,255,160,0.12);
+  --text: #e8eaf0;
+  --text-muted: #7a7d8a;
+  --text-dim: #3f4150;
+  --gold: #ffc66d;
+  --mono: 'Space Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--sans);font-size:15px;line-height:1.6;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(61,255,160,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(61,255,160,0.025) 1px,transparent 1px);
+  background-size:60px 60px;pointer-events:none;z-index:0;
+}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;}
+.orb1{width:600px;height:600px;background:rgba(61,255,160,0.06);top:-200px;left:-100px;}
+.orb2{width:400px;height:400px;background:rgba(0,229,255,0.04);bottom:0;right:-100px;}
+
+/* NAV */
+nav{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;height:64px;
+  background:rgba(5,5,7,0.88);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:var(--mono);font-size:18px;font-weight:700;
+  color:var(--accent);letter-spacing:-0.5px;text-decoration:none;
+  display:flex;align-items:center;gap:8px;
+}
+.nav-logo::before{content:'▸';font-size:14px;}
+.nav-back{
+  color:var(--text-muted);text-decoration:none;font-size:13px;
+  font-family:var(--mono);display:flex;align-items:center;gap:8px;
+  transition:color .15s;
+}
+.nav-back:hover{color:var(--text);}
+.nav-cta{
+  background:var(--accent);color:#050507;padding:8px 20px;border-radius:6px;
+  font-family:var(--mono);font-size:12px;font-weight:700;
+  text-decoration:none;letter-spacing:0.5px;transition:opacity .15s;
+}
+.nav-cta:hover{opacity:0.85;}
+
+section{position:relative;z-index:1;}
+
+/* BREADCRUMB */
+.breadcrumb{
+  padding:20px 60px 0;
+  font-family:var(--mono);font-size:11px;color:var(--text-dim);
+  display:flex;align-items:center;gap:8px;
+}
+.breadcrumb a{color:var(--text-muted);text-decoration:none;}
+.breadcrumb a:hover{color:var(--accent);}
+.breadcrumb span{color:var(--text-dim);}
+
+/* HERO */
+.product-hero{
+  display:grid;grid-template-columns:1fr 420px;gap:60px;
+  padding:40px 60px 60px;align-items:start;
+}
+.hero-left{}
+.product-tag{
+  font-family:var(--mono);font-size:10px;color:var(--accent);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.product-tag::before{content:'●';animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+h1{
+  font-size:clamp(36px,5vw,60px);font-weight:600;
+  letter-spacing:-1.5px;line-height:1.05;margin-bottom:20px;
+}
+h1 em{font-style:normal;color:var(--accent);}
+.product-tagline{
+  font-size:17px;color:var(--text-muted);font-weight:300;
+  max-width:540px;line-height:1.7;margin-bottom:32px;
+}
+.hero-badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:40px;}
+.badge{
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;
+  padding:5px 12px;border-radius:4px;text-transform:uppercase;
+}
+.badge-green{background:rgba(61,255,160,0.1);color:var(--accent);border:1px solid rgba(61,255,160,0.2);}
+.badge-blue{background:rgba(0,229,255,0.1);color:var(--accent2);border:1px solid rgba(0,229,255,0.2);}
+.badge-gold{background:rgba(255,198,109,0.1);color:var(--gold);border:1px solid rgba(255,198,109,0.2);}
+
+/* MEDIA BLOCK — PLACEHOLDER SLOTS */
+.media-block{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;margin-bottom:16px;
+}
+.video-slot{
+  position:relative;width:100%;padding-bottom:56.25%;
+  background:var(--bg3);display:block;
+}
+.video-slot iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.video-placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;
+  background:linear-gradient(135deg,var(--bg2),var(--bg3));
+  border:2px dashed var(--border);border-radius:0;
+  color:var(--text-dim);font-family:var(--mono);font-size:11px;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  transition:border-color .2s,color .2s;
+}
+.video-placeholder:hover{border-color:rgba(61,255,160,0.3);color:var(--accent);}
+.play-icon{
+  width:52px;height:52px;border-radius:50%;
+  border:1px solid currentColor;display:flex;align-items:center;justify-content:center;
+  font-size:18px;padding-left:4px;
+}
+.media-caption{
+  padding:12px 16px;font-size:12px;color:var(--text-muted);
+  font-family:var(--mono);border-top:1px solid var(--border);
+}
+
+/* SCREENSHOT GRID */
+.screenshots-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  margin-bottom:16px;
+}
+.screenshot-slot{
+  aspect-ratio:16/9;background:var(--bg3);border-radius:8px;
+  border:2px dashed var(--border);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:6px;
+  color:var(--text-dim);font-family:var(--mono);font-size:9px;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  transition:border-color .2s,color .2s;overflow:hidden;position:relative;
+}
+.screenshot-slot:hover{border-color:rgba(61,255,160,0.3);color:var(--accent);}
+.screenshot-slot img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;display:none;
+}
+.screenshot-slot.has-image img{display:block;}
+.screenshot-slot.has-image .slot-label{display:none;}
+.slot-icon{font-size:20px;}
+.slot-label{font-size:9px;}
+
+/* SECTION HEADINGS */
+.section-label{
+  font-family:var(--mono);font-size:11px;color:var(--accent);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;
+}
+.section-title{
+  font-size:26px;font-weight:600;letter-spacing:-0.5px;margin-bottom:24px;
+}
+
+/* DETAILS */
+.details-section{padding:0 60px 60px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;}
+.detail-block{}
+.detail-block h3{font-size:15px;font-weight:600;margin-bottom:12px;}
+.feature-list{list-style:none;}
+.feature-list li{
+  font-size:13px;color:var(--text-muted);padding:7px 0;
+  display:flex;align-items:flex-start;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.feature-list li:last-child{border-bottom:none;}
+.feature-list li::before{content:'▸';color:var(--accent);font-size:10px;flex-shrink:0;margin-top:2px;}
+
+/* DESCRIPTION EDITOR AREA */
+.desc-block{
+  padding:24px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;margin-bottom:32px;
+}
+.desc-block p{font-size:14px;color:var(--text-muted);line-height:1.9;}
+
+/* REQUIREMENTS */
+.req-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.req-card{
+  padding:20px;background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;
+}
+.req-card h4{font-size:12px;font-family:var(--mono);color:var(--text-dim);
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+.req-item{font-size:13px;color:var(--text-muted);padding:4px 0;display:flex;gap:8px;}
+.req-item::before{content:'–';color:var(--text-dim);}
+
+/* SIDEBAR — PRICING */
+.sidebar{position:sticky;top:84px;}
+.pricing-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;margin-bottom:16px;
+}
+.pricing-header{
+  padding:20px 24px 16px;border-bottom:1px solid var(--border);
+}
+.pricing-header h3{font-size:16px;font-weight:600;margin-bottom:4px;}
+.pricing-header p{font-size:12px;color:var(--text-muted);}
+
+.key-tiers{padding:16px 24px;display:flex;flex-direction:column;gap:10px;}
+.tier{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;cursor:pointer;transition:border-color .2s,background .2s;
+  position:relative;overflow:hidden;
+}
+.tier:hover{border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);}
+.tier.selected{border-color:var(--accent);background:var(--accent-dim);}
+.tier.selected::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);
+}
+.tier-label{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text);}
+.tier-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.tier-price{text-align:right;}
+.tier-amount{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);}
+.tier-amount span{font-size:11px;color:var(--text-muted);font-weight:400;}
+.tier-save{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  background:rgba(61,255,160,0.15);color:var(--accent);
+  padding:2px 6px;border-radius:3px;margin-top:3px;
+  display:inline-block;
+}
+
+.buy-section{padding:0 24px 20px;display:flex;flex-direction:column;gap:10px;}
+.btn-buy{
+  display:block;width:100%;text-align:center;
+  background:var(--accent);color:#050507;padding:14px;border-radius:8px;
+  font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.5px;
+  text-decoration:none;border:none;cursor:pointer;transition:all .2s;
+}
+.btn-buy:hover{opacity:0.88;transform:translateY(-1px);box-shadow:0 6px 24px rgba(61,255,160,0.25);}
+.btn-discord{
+  display:block;width:100%;text-align:center;
+  background:transparent;color:var(--text-muted);padding:12px;border-radius:8px;
+  font-family:var(--mono);font-size:12px;letter-spacing:0.5px;
+  text-decoration:none;border:1px solid var(--border);cursor:pointer;transition:all .2s;
+}
+.btn-discord:hover{border-color:rgba(255,255,255,0.2);color:var(--text);}
+.buy-note{font-size:11px;color:var(--text-dim);text-align:center;font-family:var(--mono);padding:0 24px 20px;}
+
+/* INFO PILLS */
+.info-pills{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 24px 20px;}
+.info-pill{
+  padding:10px 12px;background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;text-align:center;
+}
+.info-pill-val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);}
+.info-pill-key{font-size:10px;color:var(--text-muted);margin-top:2px;font-family:var(--mono);}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--border);padding:32px 60px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+  position:relative;z-index:1;
+}
+.footer-logo{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);}
+.footer-copy{font-size:12px;color:var(--text-dim);font-family:var(--mono);}
+
+@media(max-width:1000px){
+  .product-hero{grid-template-columns:1fr;padding:24px;}
+  .sidebar{position:static;}
+  .details-section{padding:0 24px 40px;}
+  .breadcrumb{padding:16px 24px 0;}
+  nav{padding:0 24px;}
+  .screenshots-grid{grid-template-columns:repeat(2,1fr);}
+  .detail-grid{grid-template-columns:1fr;}
+  footer{padding:24px;}
+  .req-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html">Vector Labs</a>
+  <a class="nav-back" href="index.html">← Back to Tools</a>
+  <a class="nav-cta" href="#buy">GET KEY</a>
+</nav>
+
+<div class="breadcrumb">
+  <a href="index.html">Home</a>
+  <span>/</span>
+  <a href="index.html#products">Tools</a>
+  <span>/</span>
+  <span style="color:var(--text-muted);">Stat Tracker Pro</span>
+</div>
+
+<!-- ===================== HERO GRID ===================== -->
+<section>
+<div class="product-hero">
+
+  <!-- LEFT: MEDIA + DETAILS -->
+  <div class="hero-left">
+
+    <div class="product-tag">All Games · Analytics Tool</div>
+    <h1>Stat Tracker <em>Pro</em></h1>
+    <p class="product-tagline">
+      Deep performance analytics across every session. Know exactly where you're losing — and fix it.
+    </p>
+    <div class="hero-badges">
+      <span class="badge badge-green">Live</span>
+      <span class="badge badge-blue">6 Games Supported</span>
+      <span class="badge badge-gold">Most Popular</span>
+    </div>
+
+    <!-- VIDEO SLOT -->
+    <div class="section-label">/ Preview</div>
+    <div class="media-block" style="margin-bottom:8px;">
+      <div class="video-slot">
+        <!--
+          TO ADD A VIDEO: Replace the div below with:
+          <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" allowfullscreen></iframe>
+
+          OR for a direct MP4:
+          <video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+            <source src="your-video.mp4" type="video/mp4">
+          </video>
+        -->
+        <div class="video-placeholder">
+          <div class="play-icon">▶</div>
+          <span>Drop YouTube embed or video here</span>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text-dim);font-family:var(--mono);margin-bottom:32px;padding-left:4px;">
+      Replace the placeholder above with your YouTube embed or video file.
+    </div>
+
+    <!-- SCREENSHOTS -->
+    <div class="section-label">/ Screenshots</div>
+    <div class="screenshots-grid">
+      <!--
+        TO ADD SCREENSHOTS: Add class="has-image" to the slot div and
+        set the src on the <img> inside it.
+        Example: <div class="screenshot-slot has-image">
+                   <img src="screenshots/screen1.jpg" alt="Stat dashboard"/>
+                 </div>
+      -->
+      <div class="screenshot-slot">
+        <img src="" alt=""/>
+        <span class="slot-icon">📷</span>
+        <span class="slot-label">Screenshot 1</span>
+      </div>
+      <div class="screenshot-slot">
+        <img src="" alt=""/>
+        <span class="slot-icon">📷</span>
+        <span class="slot-label">Screenshot 2</span>
+      </div>
+      <div class="screenshot-slot">
+        <img src="" alt=""/>
+        <span class="slot-icon">📷</span>
+        <span class="slot-label">Screenshot 3</span>
+      </div>
+      <div class="screenshot-slot">
+        <img src="" alt=""/>
+        <span class="slot-icon">📷</span>
+        <span class="slot-label">Screenshot 4</span>
+      </div>
+      <div class="screenshot-slot">
+        <img src="" alt=""/>
+        <span class="slot-icon">📷</span>
+        <span class="slot-label">Screenshot 5</span>
+      </div>
+      <div class="screenshot-slot">
+        <img src="" alt=""/>
+        <span class="slot-icon">📷</span>
+        <span class="slot-label">Screenshot 6</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: PRICING SIDEBAR -->
+  <div class="sidebar" id="buy">
+    <div class="pricing-card">
+      <div class="pricing-header">
+        <h3>Get Your Key</h3>
+        <p>Instant delivery via Discord bot after purchase.</p>
+      </div>
+
+      <div class="key-tiers" id="tier-group">
+        <div class="tier selected" data-price="$3" data-period="/day" onclick="selectTier(this)">
+          <div>
+            <div class="tier-label">1 Day</div>
+            <div class="tier-sub">Try it out</div>
+          </div>
+          <div class="tier-price">
+            <div class="tier-amount">$3<span>/day</span></div>
+          </div>
+        </div>
+
+        <div class="tier" data-price="$9" data-period="/week" onclick="selectTier(this)">
+          <div>
+            <div class="tier-label">7 Days</div>
+            <div class="tier-sub">1 week access</div>
+          </div>
+          <div class="tier-price">
+            <div class="tier-amount">$9<span>/week</span></div>
+            <div class="tier-save">SAVE 57%</div>
+          </div>
+        </div>
+
+        <div class="tier" data-price="$19" data-period="/month" onclick="selectTier(this)">
+          <div>
+            <div class="tier-label">30 Days</div>
+            <div class="tier-sub">Best value</div>
+          </div>
+          <div class="tier-price">
+            <div class="tier-amount">$19<span>/month</span></div>
+            <div class="tier-save">SAVE 79%</div>
+          </div>
+        </div>
+
+        <div class="tier" data-price="$49" data-period="/3mo" onclick="selectTier(this)">
+          <div>
+            <div class="tier-label">90 Days</div>
+            <div class="tier-sub">Hardcore grind</div>
+          </div>
+          <div class="tier-price">
+            <div class="tier-amount">$49<span>/3mo</span></div>
+            <div class="tier-save">SAVE 82%</div>
+          </div>
+        </div>
+
+        <div class="tier" data-price="$79" data-period="/year" onclick="selectTier(this)">
+          <div>
+            <div class="tier-label">Lifetime</div>
+            <div class="tier-sub">Pay once, keep forever</div>
+          </div>
+          <div class="tier-price">
+            <div class="tier-amount">$79<span></span></div>
+            <div class="tier-save">BEST DEAL</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="buy-section">
+        <a class="btn-buy" href="#discord" id="buy-btn">Purchase Key — $3</a>
+        <a class="btn-discord" href="#discord">Purchase via Discord</a>
+      </div>
+      <div class="buy-note">🔒 Secure · Instant key delivery · No account needed</div>
+
+      <div class="info-pills">
+        <div class="info-pill">
+          <div class="info-pill-val">~2 min</div>
+          <div class="info-pill-key">Setup time</div>
+        </div>
+        <div class="info-pill">
+          <div class="info-pill-val">6 games</div>
+          <div class="info-pill-key">Supported</div>
+        </div>
+        <div class="info-pill">
+          <div class="info-pill-val">24/7</div>
+          <div class="info-pill-key">Support</div>
+        </div>
+        <div class="info-pill">
+          <div class="info-pill-val">99.8%</div>
+          <div class="info-pill-key">Uptime</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINI REVIEW -->
+    <div style="padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;">
+      <div style="color:var(--gold);font-size:12px;letter-spacing:1px;margin-bottom:10px;">★★★★★</div>
+      <p style="font-size:13px;color:var(--text-muted);font-style:italic;line-height:1.7;margin-bottom:14px;">
+        "Showed me I was losing 60% of pistol rounds. Fixed my buy patterns, climbed two divisions in a week."
+      </p>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--border-bright);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:700;">KR</div>
+        <div>
+          <div style="font-size:13px;font-weight:600;">kryptic_rx</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:var(--mono);">Valorant · 3 months</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ===================== DETAILS ===================== -->
+<section class="details-section">
+  <div class="section-label">/ About</div>
+  <div class="section-title">What is Stat Tracker Pro?</div>
+
+  <!--
+    DESCRIPTION: Edit the paragraphs below to describe your product.
+    Add as many <p> tags as you want inside .desc-block.
+  -->
+  <div class="desc-block">
+    <p>
+      Stat Tracker Pro connects to official game APIs to pull your real-time and historical match data.
+      Unlike generic trackers, it breaks down your performance at a granular level —
+      showing you not just your overall KD, but your accuracy per weapon, win rate per map,
+      and trend lines across the last 30, 60, or 90 days.
+    </p>
+    <br/>
+    <p>
+      Setup takes under two minutes: activate your key, link your game account via Discord,
+      and your dashboard is live. Data refreshes after every match.
+      Share your profile card with a single link — no account required for viewers.
+    </p>
+    <br/>
+    <p style="color:var(--text-dim);font-family:var(--mono);font-size:12px;">
+      ← Replace this text with your own product description.
+    </p>
+  </div>
+
+  <div class="detail-grid">
+    <div class="detail-block">
+      <h3>Features</h3>
+      <!--
+        FEATURES: Edit this list. Add or remove <li> items as needed.
+      -->
+      <ul class="feature-list">
+        <li>Session & lifetime stat history with trend graphs</li>
+        <li>Accuracy heatmaps broken down per weapon</li>
+        <li>Map win/loss ratio & performance breakdown</li>
+        <li>KD, ADR, HS%, and 30+ tracked metrics</li>
+        <li>Shareable profile card with custom URL</li>
+        <li>Discord bot integration for quick stat lookups</li>
+        <li>Apex Legends, Valorant, CS2, Fortnite, Warzone, Rust</li>
+        <li>Data refreshes automatically after each match</li>
+      </ul>
+    </div>
+
+    <div class="detail-block">
+      <h3>Requirements</h3>
+      <div class="req-grid">
+        <div class="req-card">
+          <h4>System</h4>
+          <div class="req-item">Windows 10 / 11</div>
+          <div class="req-item">4GB RAM minimum</div>
+          <div class="req-item">Internet connection</div>
+          <div class="req-item">Discord account</div>
+        </div>
+        <div class="req-card">
+          <h4>Games</h4>
+          <div class="req-item">Apex Legends</div>
+          <div class="req-item">Valorant</div>
+          <div class="req-item">CS2</div>
+          <div class="req-item">Fortnite & more</div>
+        </div>
+      </div>
+
+      <br/>
+      <h3 style="margin-bottom:12px;">Setup Guide</h3>
+      <ol style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+        <li style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-dim);border:1px solid var(--border-bright);padding:2px 8px;border-radius:4px;flex-shrink:0;margin-top:1px;">01</span>
+          <span style="font-size:13px;color:var(--text-muted);">Purchase a key and join our Discord server.</span>
+        </li>
+        <li style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-dim);border:1px solid var(--border-bright);padding:2px 8px;border-radius:4px;flex-shrink:0;margin-top:1px;">02</span>
+          <span style="font-size:13px;color:var(--text-muted);">Run <code style="background:var(--bg3);padding:2px 6px;border-radius:3px;font-size:12px;color:var(--accent2);">/activate [key]</code> in the bot channel.</span>
+        </li>
+        <li style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-dim);border:1px solid var(--border-bright);padding:2px 8px;border-radius:4px;flex-shrink:0;margin-top:1px;">03</span>
+          <span style="font-size:13px;color:var(--text-muted);">Link your game account — your dashboard goes live instantly.</span>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">▸ Vector Labs</div>
+  <div style="display:flex;gap:24px;">
+    <a href="#" style="font-size:12px;color:var(--text-muted);text-decoration:none;font-family:var(--mono);">Terms</a>
+    <a href="#" style="font-size:12px;color:var(--text-muted);text-decoration:none;font-family:var(--mono);">Privacy</a>
+    <a href="#" style="font-size:12px;color:var(--text-muted);text-decoration:none;font-family:var(--mono);">Discord</a>
+  </div>
+  <div class="footer-copy">© 2025 Vector Labs. All rights reserved.</div>
+</footer>
+
+<!-- CURSOR TRAIL -->
+<canvas id="trail-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:9999;"></canvas>
+
+<script>
+// Tier selection
+function selectTier(el) {
+  document.querySelectorAll('.tier').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  const price = el.dataset.price;
+  document.getElementById('buy-btn').textContent = 'Purchase Key — ' + price;
+}
+
+// Cursor trail
+const canvas = document.getElementById('trail-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+const particles = [];
+let mx = -999, my = -999;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function spawn() {
+  if (mx < 0) return;
+  const angle = Math.random() * Math.PI * 2;
+  const speed = Math.random() * 0.6 + 0.1;
+  particles.push({ x: mx, y: my, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 0.3, life: 1, size: Math.random() * 3 + 1 });
+}
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  for (let i = 0; i < 3; i++) spawn();
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy; p.life -= 0.025;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    const alpha = p.life * 0.35;
+    const radius = p.size * p.life;
+    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius * 6);
+    grad.addColorStop(0, `rgba(61,255,160,${alpha})`);
+    grad.addColorStop(1, `rgba(61,255,160,0)`);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius * 6, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>

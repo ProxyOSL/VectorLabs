@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vector Labs — Precision Gaming Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #050507;
+  --bg2: #0b0c10;
+  --bg3: #111318;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.08);
+  --border-bright: rgba(99,255,180,0.3);
+  --accent: #3dffa0;
+  --accent2: #00e5ff;
+  --accent-dim: rgba(61,255,160,0.12);
+  --text: #e8eaf0;
+  --text-muted: #7a7d8a;
+  --text-dim: #3f4150;
+  --gold: #ffc66d;
+  --mono: 'Space Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+body::before {
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(61,255,160,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61,255,160,0.025) 1px, transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;z-index:0;
+}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;}
+.orb1{width:600px;height:600px;background:rgba(61,255,160,0.06);top:-200px;left:-100px;}
+.orb2{width:400px;height:400px;background:rgba(0,229,255,0.05);bottom:100px;right:-100px;}
+
+/* NAV */
+nav{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;height:64px;
+  background:rgba(5,5,7,0.88);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:var(--mono);font-size:18px;font-weight:700;
+  color:var(--accent);letter-spacing:-0.5px;text-decoration:none;
+  display:flex;align-items:center;gap:8px;
+}
+.nav-logo::before{content:'▸';font-size:14px;}
+.nav-links{display:flex;gap:32px;}
+.nav-links a{color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:400;transition:color .15s;}
+.nav-links a:hover{color:var(--text);}
+.nav-cta{
+  background:var(--accent);color:#050507;
+  padding:8px 20px;border-radius:6px;
+  font-family:var(--mono);font-size:12px;font-weight:700;
+  text-decoration:none;letter-spacing:0.5px;transition:opacity .15s;
+}
+.nav-cta:hover{opacity:0.85;}
+
+section{position:relative;z-index:1;}
+
+/* HERO */
+.hero{
+  min-height:92vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:100px 40px 80px;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent-dim);border:1px solid var(--border-bright);
+  border-radius:100px;padding:5px 16px;
+  font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:1px;
+  margin-bottom:36px;
+}
+.hero-badge::before{content:'●';font-size:8px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.hero h1{
+  font-size:clamp(52px,8vw,96px);font-weight:600;line-height:1.0;
+  letter-spacing:-2px;margin-bottom:24px;max-width:900px;
+}
+.hero h1 em{font-style:normal;color:var(--accent);}
+.hero p{
+  font-size:18px;color:var(--text-muted);max-width:520px;
+  margin:0 auto 48px;font-weight:300;
+}
+.hero-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+.btn-primary{
+  background:var(--accent);color:#050507;
+  padding:14px 32px;border-radius:7px;
+  font-family:var(--mono);font-size:13px;font-weight:700;
+  text-decoration:none;letter-spacing:0.5px;transition:all .2s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(61,255,160,0.25);}
+.btn-ghost{
+  background:transparent;color:var(--text);
+  padding:14px 32px;border-radius:7px;border:1px solid var(--border);
+  font-family:var(--mono);font-size:13px;text-decoration:none;
+  letter-spacing:0.5px;transition:all .2s;
+}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.25);background:var(--surface);}
+
+/* STATS */
+.stats-bar{
+  display:flex;justify-content:center;gap:64px;
+  padding:40px 60px;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  margin:0 60px;flex-wrap:wrap;
+}
+.stat{text-align:center;}
+.stat-num{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--accent);}
+.stat-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+
+/* TICKER */
+.ticker{
+  padding:12px 60px;background:var(--bg2);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  overflow:hidden;font-family:var(--mono);font-size:11px;color:var(--text-dim);
+}
+.ticker-inner{
+  display:inline-flex;gap:60px;white-space:nowrap;
+  animation:scroll 28s linear infinite;
+}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item{display:inline-flex;align-items:center;gap:10px;}
+.ticker-ok{color:var(--accent);}
+
+/* PRODUCTS */
+.products{padding:100px 60px;}
+.section-label{
+  font-family:var(--mono);font-size:11px;color:var(--accent);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;
+}
+.section-title{
+  font-size:clamp(28px,4vw,44px);font-weight:600;
+  letter-spacing:-1px;margin-bottom:60px;max-width:600px;
+}
+.product-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:1px;background:var(--border);
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;
+}
+.product-card{
+  background:var(--bg2);padding:32px;
+  transition:background .2s;position:relative;overflow:hidden;
+}
+.product-card:hover{background:var(--bg3);}
+.product-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.product-card:hover::before{opacity:1;}
+.product-game{
+  font-family:var(--mono);font-size:10px;color:var(--text-dim);
+  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;
+}
+.product-name{font-size:20px;font-weight:600;margin-bottom:8px;}
+.product-desc{font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.7;}
+.product-features{list-style:none;margin-bottom:28px;}
+.product-features li{
+  font-size:13px;color:var(--text-muted);padding:5px 0;
+  display:flex;align-items:center;gap:10px;
+}
+.product-features li::before{content:'▸';color:var(--accent);font-size:10px;flex-shrink:0;}
+.product-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid var(--border);padding-top:20px;
+}
+.product-price{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);}
+.product-price span{font-size:13px;color:var(--text-muted);font-weight:400;}
+.status-badge{
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:1px;padding:4px 10px;border-radius:4px;text-transform:uppercase;
+}
+.status-live{background:rgba(61,255,160,0.1);color:var(--accent);border:1px solid rgba(61,255,160,0.2);}
+.status-new{background:rgba(0,229,255,0.1);color:var(--accent2);border:1px solid rgba(0,229,255,0.2);}
+.status-popular{background:rgba(255,198,109,0.1);color:var(--gold);border:1px solid rgba(255,198,109,0.2);}
+.buy-btn{
+  display:inline-block;background:var(--accent-dim);
+  border:1px solid var(--border-bright);color:var(--accent);
+  padding:9px 20px;border-radius:6px;
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.5px;
+  text-decoration:none;transition:all .2s;cursor:pointer;
+}
+.buy-btn:hover{background:rgba(61,255,160,0.2);box-shadow:0 0 20px rgba(61,255,160,0.15);}
+
+/* FEATURES */
+.features{padding:80px 60px;}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;margin-top:48px;}
+.feature-card{
+  padding:28px;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;
+  transition:border-color .2s,background .2s;
+}
+.feature-card:hover{border-color:rgba(255,255,255,0.14);background:var(--surface-hover);}
+.feature-icon{font-size:24px;margin-bottom:16px;display:block;}
+.feature-name{font-size:15px;font-weight:600;margin-bottom:8px;}
+.feature-desc{font-size:13px;color:var(--text-muted);line-height:1.7;}
+
+/* REVIEWS */
+.trust{padding:80px 60px;}
+.trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:48px;}
+.review-card{
+  padding:28px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:10px;
+}
+.review-text{font-size:14px;color:var(--text-muted);line-height:1.8;margin-bottom:20px;font-style:italic;}
+.review-author{display:flex;align-items:center;gap:12px;}
+.review-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--accent-dim);border:1px solid var(--border-bright);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;flex-shrink:0;
+}
+.review-name{font-size:13px;font-weight:600;}
+.review-game{font-size:11px;color:var(--text-muted);font-family:var(--mono);}
+.stars{color:var(--gold);font-size:12px;letter-spacing:1px;margin-bottom:12px;}
+
+/* CTA */
+.discord-cta{
+  margin:60px 60px;padding:60px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:16px;
+  text-align:center;position:relative;overflow:hidden;
+}
+.discord-cta::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(61,255,160,0.06),transparent 60%);
+  pointer-events:none;
+}
+.discord-cta h2{font-size:36px;font-weight:600;letter-spacing:-0.5px;margin-bottom:16px;}
+.discord-cta p{color:var(--text-muted);margin-bottom:32px;max-width:460px;margin-left:auto;margin-right:auto;}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--border);padding:40px 60px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;
+}
+.footer-logo{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);}
+.footer-copy{font-size:12px;color:var(--text-dim);font-family:var(--mono);}
+.footer-links{display:flex;gap:24px;}
+.footer-links a{font-size:12px;color:var(--text-muted);text-decoration:none;font-family:var(--mono);}
+.footer-links a:hover{color:var(--text);}
+
+@media(max-width:900px){
+  nav{padding:0 24px;}
+  .nav-links{display:none;}
+  .hero{padding:80px 24px 60px;}
+  .stats-bar{margin:0 24px;padding:32px 24px;gap:32px;}
+  .products,.features,.trust{padding:60px 24px;}
+  .discord-cta{margin:40px 24px;padding:40px 24px;}
+  footer{padding:32px 24px;flex-direction:column;align-items:flex-start;}
+  .trust-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<nav>
+  <a class="nav-logo" href="#">Vector Labs</a>
+  <div class="nav-links">
+    <a href="#products">Tools</a>
+    <a href="#features">Features</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#discord">Discord</a>
+  </div>
+  <a class="nav-cta" href="#discord">JOIN NOW</a>
+</nav>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item"><span class="ticker-ok">●</span> STAT TRACKER — LIVE</span>
+    <span class="ticker-item"><span class="ticker-ok">●</span> SETTINGS OPTIMIZER — LIVE</span>
+    <span class="ticker-item"><span class="ticker-ok">●</span> CROSSHAIR STUDIO — LIVE</span>
+    <span class="ticker-item"><span class="ticker-ok">●</span> SENS CONVERTER — LIVE</span>
+    <span class="ticker-item"><span class="ticker-ok">●</span> OVERLAY HUD — LIVE</span>
+    <span class="ticker-item"><span class="ticker-ok">●</span> PING MONITOR — LIVE</span>
+    <span class="ticker-item"><span class="ticker-ok">●</span> STAT TRACKER — LIVE</span>
+    <span class="ticker-item"><span class="ticker-ok">●</span> SETTINGS OPTIMIZER — LIVE</span>
+    <span class="ticker-item"><span class="ticker-ok">●</span> CROSSHAIR STUDIO — LIVE</span>
+    <span class="ticker-item"><span class="ticker-ok">●</span> SENS CONVERTER — LIVE</span>
+    <span class="ticker-item"><span class="ticker-ok">●</span> OVERLAY HUD — LIVE</span>
+    <span class="ticker-item"><span class="ticker-ok">●</span> PING MONITOR — LIVE</span>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-badge">PRECISION GAMING TOOLS · 12K+ USERS</div>
+  <h1>Sharpen Your<br/><em>Edge.</em></h1>
+  <p>Professional-grade utilities for serious players. Stat tracking, settings optimization, crosshair tools, and more.</p>
+  <div class="hero-btns">
+    <a class="btn-primary" href="#products">Browse Tools ▸</a>
+    <a class="btn-ghost" href="#discord">Join Discord</a>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">12,400+</div><div class="stat-label">Active Users</div></div>
+  <div class="stat"><div class="stat-num">99.8%</div><div class="stat-label">Uptime</div></div>
+  <div class="stat"><div class="stat-num">8</div><div class="stat-label">Tools Available</div></div>
+  <div class="stat"><div class="stat-num">6</div><div class="stat-label">Games Supported</div></div>
+</div>
+
+<section class="products" id="products">
+  <div class="section-label">/ Tools</div>
+  <h2 class="section-title">The Vector Suite</h2>
+  <div class="product-grid">
+
+    <div class="product-card">
+      <div class="product-game">All Games</div>
+      <div class="product-name">Stat Tracker Pro</div>
+      <div class="product-desc">Deep performance analytics across sessions. Track KD, win rate, accuracy trends, and map-by-map breakdowns in real time.</div>
+      <ul class="product-features">
+        <li>Session & lifetime stat history</li>
+        <li>Accuracy heatmaps per game</li>
+        <li>Shareable profile cards</li>
+        <li>Apex, Valorant, CS2 & more</li>
+      </ul>
+      <div class="product-footer">
+        <div class="product-price">$9<span>/month</span></div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="status-badge status-popular">Popular</span>
+          <a class="buy-btn" href="#discord">GET</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-game">FPS Titles</div>
+      <div class="product-name">Settings Optimizer</div>
+      <div class="product-desc">Game-specific config generator. Input your hardware and playstyle; get pro-tuned graphics, network, and input settings exported instantly.</div>
+      <ul class="product-features">
+        <li>GPU & CPU-aware presets</li>
+        <li>Pro player config database</li>
+        <li>One-click config export</li>
+        <li>Monitor Hz & resolution aware</li>
+      </ul>
+      <div class="product-footer">
+        <div class="product-price">$7<span>/month</span></div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="status-badge status-live">Live</span>
+          <a class="buy-btn" href="#discord">GET</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-game">CS2 · Valorant</div>
+      <div class="product-name">Crosshair Studio</div>
+      <div class="product-desc">Visual crosshair designer with live preview, import/export, and a searchable library of pro player crosshairs updated weekly.</div>
+      <ul class="product-features">
+        <li>Full custom crosshair builder</li>
+        <li>500+ pro crosshair library</li>
+        <li>One-click in-game import</li>
+        <li>Animated preview canvas</li>
+      </ul>
+      <div class="product-footer">
+        <div class="product-price">Free<span></span></div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="status-badge status-new">Free</span>
+          <a class="buy-btn" href="#discord">GET</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-game">All FPS</div>
+      <div class="product-name">Sensitivity Converter</div>
+      <div class="product-desc">Precision cross-game sensitivity conversion. Switch titles without losing your muscle memory — supports 40+ games and DPI profiles.</div>
+      <ul class="product-features">
+        <li>40+ game conversion matrix</li>
+        <li>DPI profile management</li>
+        <li>eDPI & cm/360 calculator</li>
+        <li>Polling rate guidance</li>
+      </ul>
+      <div class="product-footer">
+        <div class="product-price">Free<span></span></div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="status-badge status-new">Free</span>
+          <a class="buy-btn" href="#discord">GET</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-game">All Games</div>
+      <div class="product-name">Overlay HUD</div>
+      <div class="product-desc">Lightweight desktop overlay showing live FPS, ping, CPU/GPU temps, and session stats. Fully customizable and game-agnostic.</div>
+      <ul class="product-features">
+        <li>Always-on-top overlay widget</li>
+        <li>FPS, ping, temps in real time</li>
+        <li>Custom layout & color themes</li>
+        <li>Minimal CPU footprint (&lt;1%)</li>
+      </ul>
+      <div class="product-footer">
+        <div class="product-price">$6<span>/month</span></div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="status-badge status-live">Live</span>
+          <a class="buy-btn" href="#discord">GET</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" style="background:rgba(61,255,160,0.03);border-top:2px solid rgba(61,255,160,0.25);">
+      <div class="product-game">Everything</div>
+      <div class="product-name">Vector All-Access</div>
+      <div class="product-desc">Every tool in the suite plus priority support, early access to new releases, and a members-only Discord channel.</div>
+      <ul class="product-features">
+        <li>All tools included</li>
+        <li>Priority Discord support</li>
+        <li>Early access & beta tools</li>
+        <li>Exclusive member channel</li>
+      </ul>
+      <div class="product-footer">
+        <div class="product-price">$19<span>/month</span></div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="status-badge status-popular">Best Value</span>
+          <a class="buy-btn" href="#discord">GET</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="section-label">/ Why Vector Labs</div>
+  <h2 class="section-title">Built Different</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">⚡</span>
+      <div class="feature-name">Real-Time Data</div>
+      <div class="feature-desc">All stat tools pull live game data via official APIs. No scraping, no stale numbers — always accurate.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔒</span>
+      <div class="feature-name">Account Safe</div>
+      <div class="feature-desc">Every tool is overlay or web-based. Nothing touches game memory or violates any Terms of Service.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">💬</span>
+      <div class="feature-name">24/7 Discord Support</div>
+      <div class="feature-desc">Active support staff in our community server. Average first response under 15 minutes.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🎯</span>
+      <div class="feature-name">Pro-Curated Configs</div>
+      <div class="feature-desc">Our database of pro player settings is updated weekly by our research team, not scraped automatically.</div>
+    </div>
+  </div>
+</section>
+
+<section class="trust" id="reviews">
+  <div class="section-label">/ Reviews</div>
+  <h2 class="section-title">What Users Say</h2>
+  <div class="trust-grid">
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <p class="review-text">"The stat tracker showed me I was losing 60% of my pistol rounds — fixed my buy patterns and my rank climbed two divisions in a week."</p>
+      <div class="review-author">
+        <div class="review-avatar">KR</div>
+        <div><div class="review-name">kryptic_rx</div><div class="review-game">Valorant · 3 months</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <p class="review-text">"Crosshair Studio is the best free tool out there. Imported TenZ's crosshair in literally 10 seconds. The pro library alone is worth joining for."</p>
+      <div class="review-author">
+        <div class="review-avatar">TS</div>
+        <div><div class="review-name">tsolaris</div><div class="review-game">CS2 · 5 months</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <p class="review-text">"Settings Optimizer got me an extra 60FPS in Apex with the same hardware. The GPU-aware presets actually work. Night and day difference."</p>
+      <div class="review-author">
+        <div class="review-avatar">MV</div>
+        <div><div class="review-name">mvrqx</div><div class="review-game">Apex Legends · 2 months</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <p class="review-text">"All-Access is a no-brainer at $19. The Overlay HUD + Stat Tracker combo alone is worth more than that. Support answered me in 8 minutes at midnight."</p>
+      <div class="review-author">
+        <div class="review-avatar">FX</div>
+        <div><div class="review-name">fxrzen</div><div class="review-game">All-Access · 1 month</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="discord">
+  <div class="discord-cta">
+    <div class="section-label" style="margin-bottom:16px;">/ Community</div>
+    <h2>Join the Vector Labs Discord</h2>
+    <p>Get support, request features, or just talk shop with 12,000+ serious players.</p>
+    <a class="btn-primary" href="#" style="font-size:14px;">JOIN DISCORD ▸</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">▸ Vector Labs</div>
+  <div class="footer-links">
+    <a href="#">Terms</a>
+    <a href="#">Privacy</a>
+    <a href="#">Status</a>
+    <a href="#">Discord</a>
+  </div>
+  <div class="footer-copy">© 2025 Vector Labs. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
